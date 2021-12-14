@@ -283,6 +283,34 @@ class MNIST(SequenceDataset):
         return f"{'p' if self.permute else 's'}{self._name_}"
 
 
+class ImageNet(SequenceDataset):
+    _name_ = "IMAGENET"
+    d_input = 1
+    d_output = 10
+    l_output = 0
+    L = 784
+
+    @property
+    def init_defaults(self):
+        return {
+            "permute": True,
+            "val_split": 0.1,
+            "seed": 42,  # For train/val split
+        }
+
+    def setup(self):
+        from ImageNet import build_loader, get_config
+        dataset_train, dataset_val, data_loader_train, data_loader_val, mixup_fn = build_loader(get_config())
+
+        self.dataset_train = dataset_train
+        self.dataset_test = dataset_val
+
+        self.split_train_val(self.val_split)
+
+    def __str__(self):
+        return f"{'p' if self.permute else 's'}{self._name_}"
+
+
 class CIFAR10(SequenceDataset):
     _name_ = "cifar"
     d_output = 10
